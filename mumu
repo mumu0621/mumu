@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>妍婷課程記錄</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f6f8;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 20px 10px;
+        }
+        .app-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 24px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* 頂部標題與日期 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+        .header-title h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #1a1a1a;
+            font-weight: 800;
+        }
+        .header-title p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #a0a5b1;
+        }
+        .date-badge {
+            background-color: #edf2ff;
+            color: #5b81ea;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* 圓形進度條 */
+        .progress-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .circular-progress {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: conic-gradient(#4169e1 60%, #f0f2f5 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .circular-progress::before {
+            content: "";
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            background-color: #ffffff;
+            border-radius: 50%;
+        }
+        .progress-value {
+            position: relative;
+            text-align: center;
+        }
+        .progress-value h2 {
+            margin: 0;
+            font-size: 42px;
+            font-weight: 900;
+            color: #1c1c1e;
+            line-height: 1;
+        }
+        .progress-value span {
+            font-size: 11px;
+            color: #9ba1ae;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        /* 數據區塊 */
+        .stats-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-box {
+            flex: 1;
+            background-color: #f8f9fb;
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-box span {
+            display: block;
+            font-size: 13px;
+            color: #8e94a3;
+            margin-bottom: 8px;
+        }
+        .stat-box strong {
+            font-size: 22px;
+            color: #1c1c1e;
+        }
+
+        /* 輸入區塊 */
+        .input-section {
+            margin-bottom: 25px;
+        }
+        .input-label {
+            font-size: 13px;
+            color: #8e94a3;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: bold;
+        }
+        .input-wrapper {
+            background-color: #f8f9fb;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+        }
+        .input-wrapper input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1c1c1e;
+            outline: none;
+            width: 100%;
+        }
+        .input-wrapper span {
+            font-size: 16px;
+            color: #1c1c1e;
+            font-weight: bold;
+        }
+
+        /* 按鈕與底部 */
+        .btn-submit {
+            width: 100%;
+            background-color: #3b68e7;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(59, 104, 231, 0.3);
+            transition: 0.2s;
+        }
+        .btn-submit:active { transform: scale(0.98); }
+        .footer-text {
+            text-align: center;
+            color: #d1d5db;
+            font-size: 11px;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* 歷史紀錄區塊 */
+        .history-section {
+            margin-top: 40px;
+            border-top: 1px solid #f0f2f5;
+            padding-top: 20px;
+        }
+        .history-section h3 {
+            font-size: 15px;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+        .history-list {
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 13px;
+            color: #666;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <div class="header">
+        <div class="header-title">
+            <h1>課程記錄</h1>
+            <p>妍婷的專屬紀錄</p>
+        </div>
+        <div class="date-badge" id="todayDate"></div>
+    </div>
+
+    <div class="progress-container">
+        <div class="circular-progress" id="progressCircle">
+            <div class="progress-value">
+                <h2 id="remainingDisplay">0</h2>
+                <span>REMAINING</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-box">
+            <span>已上堂數</span>
+            <strong id="usedDisplay">0</strong>
+        </div>
+        <div class="stat-box">
+            <span>總節數</span>
+            <strong id="totalDisplay">0</strong>
+        </div>
+    </div>
+
+    <div class="input-section">
+        <label class="input-label">這次上課堂數</label>
+        <div class="input-wrapper">
+            <input type="number" id="deductAmount" value="1" min="1">
+            <span>堂</span>
+        </div>
+    </div>
+
+    <button class="btn-submit" onclick="recordClass()">確認記錄</button>
+
+    <div class="footer-text">RECORDED BY 妍婷</div>
+
+    <div class="history-section">
+        <h3>打卡歷史紀錄</h3>
+        <div class="history-list" id="historyList"></div>
+    </div>
+</div>
+
+<script>
+    const DEFAULT_TOTAL = 194;
+    
+    let totalClasses = DEFAULT_TOTAL;
+    let usedClasses = parseInt(localStorage.getItem('myClassUsed')) || 76;
+    let historyData = JSON.parse(localStorage.getItem('myClassHistory')) || [];
+
+    function setTodayDate() {
+        const today = new Date();
+        document.getElementById('todayDate').innerText = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
+    }
+
+    function updateUI() {
+        let remaining = totalClasses - usedClasses;
+        if (remaining < 0) remaining = 0;
+
+        document.getElementById('totalDisplay').innerText = totalClasses;
+        document.getElementById('usedDisplay').innerText = usedClasses;
+        document.getElementById('remainingDisplay').innerText = remaining;
+
+        let percentage = (remaining / totalClasses) * 100;
+        let progressCircle = document.getElementById('progressCircle');
+        progressCircle.style.background = `conic-gradient(#4169e1 ${percentage}%, #f0f2f5 0deg)`;
+
+        const historyContainer = document.getElementById('historyList');
+        historyContainer.innerHTML = '';
+        if (historyData.length === 0) {
+            historyContainer.innerHTML = '<div class="history-item"><span>尚無紀錄</span></div>';
+        } else {
+            historyData.forEach(record => {
+                historyContainer.innerHTML += `
+                    <div class="history-item">
+                        <span>${record.time}</span>
+                        <span>扣 ${record.amount} 堂 (剩 ${record.remain})</span>
+                    </div>
+                `;
+            });
+        }
+    }
+
+    function recordClass() {
+        const inputVal = document.getElementById('deductAmount').value;
+        const deductNum = parseInt(inputVal);
+
+        if (isNaN(deductNum) || deductNum <= 0) {
+            alert('請輸入正確的上課堂數！');
+            return;
+        }
+
+        let remaining = totalClasses - usedClasses;
+        if (deductNum > remaining) {
+            alert('剩餘堂數不足！');
+            return;
+        }
+
+        if(confirm(`確定要扣除 ${deductNum} 堂課嗎？`)) {
+            usedClasses += deductNum;
+            let currentRemaining = totalClasses - usedClasses;
+            
+            const now = new Date();
+            const timeString = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            historyData.unshift({
+                time: timeString,
+                amount: deductNum,
+                remain: currentRemaining
+            });
+
+            localStorage.setItem('myClassUsed', usedClasses);
+            localStorage.setItem('myClassHistory', JSON.stringify(historyData));
+            updateUI();
+            
+            alert('記錄成功！');
+            document.getElementById('deductAmount').value = 1; 
+        }
+    }
+
+    setTodayDate();
+    updateUI();
+</script>
+
+</body>
+</html>
